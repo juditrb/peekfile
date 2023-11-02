@@ -3,10 +3,10 @@
 file_path="$1"
 num_lines="${2:-3}"  # Use 3 as the default
 
-if [ -f "$file_path" ]; then
+if [[ -f "$file_path" ]]; then
     line_count=$(wc -l < "$file_path")
     
-    if [ "$line_count" -le $((2 * num_lines)) ]; then
+    if [[ "$line_count" -le $((2 * num_lines)) ]]; then
         # If the file has 2X lines or less, display the full content
         echo "File content:"
         cat "$file_path"
