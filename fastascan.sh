@@ -1,5 +1,7 @@
 #!/bin/bash
 
+##You can search for fasta/fa files in the folder you want, but if no path is written, use the current folder by default(.)
+
 if [[ -n "$1" ]]; then
 	folder="$1"
 else
