@@ -17,5 +17,6 @@ echo "Fasta Files: "
 
 
 for file in $fa_fasta_files; do
-    echo "$file" 
+    echo "$file"; awk '/^>/{gsub(/>/, "",$1); print $1; exit}' "$file" | uniq -c
 done
+
