@@ -10,7 +10,11 @@ else
 	folder="."
 fi
 
-
+if [[ -n "$2" ]]; then
+	num_lines="$2"
+else
+	num_lines="0"
+fi
 
 fa_fasta_files=$(find "$folder" -type f -name "*.fa" -o -name "*.fasta")
 
@@ -23,13 +27,17 @@ files_count=0
 total_id_count=0
 
 for file in $fa_fasta_files; do
-    ((files_count++)); IDs=$(awk '/^>/{gsub(/>/, "",$1); print $1; exit}' "$file" | uniq -c)
+	if [[ $(wc -l < "$file") -ge $num_lines ]]; then
+
+    	((files_count++)); IDs=$(awk '/^>/{gsub(/>/, "",$1); print $1; exit}' "$file" | uniq -c)
 	echo "$IDs"
 	Id_count=0
 	for Id in $IDs; do
 		((Id_count++))		
 	done
-	((total_id_count += Id_count))	
+	((total_id_count += Id_count))
+
+	fi
 done
 
 echo "Total number of files: $files_count"
