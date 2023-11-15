@@ -16,7 +16,9 @@ echo "Folder: $folder"
 echo "Fasta Files: "
 
 
+files_count=0
 for file in $fa_fasta_files; do
-    echo "$file"; awk '/^>/{gsub(/>/, "",$1); print $1; exit}' "$file" | uniq -c
+    ((files_count++)); awk '/^>/{gsub(/>/, "",$1); print $1; exit}' "$file" | uniq -c
 done
 
+echo "Total number of files: $files_count"
