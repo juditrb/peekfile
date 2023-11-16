@@ -58,9 +58,11 @@ for file in $fa_fasta_files; do
 	else
 		echo "NO SYMLINK"
 	fi
-	echo ""
 
 	num_sequences=$(grep -c "^>" "$file")
+	echo There are "$num_sequences" sequences in the file
+	
+	echo ""
 done
 
 echo "Total number of files: $files_count"
