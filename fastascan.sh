@@ -38,8 +38,11 @@ total_id_count=0
 for file in $fa_fasta_files; do
 
 	if [[ $(wc -l < "$file") -ge $num_lines ]]; then
+    	((files_count++))
 
-    	((files_count++)); echo "$file"; IDs=$(awk '/^>/{gsub(/>/, "",$1); print 	$1; exit}' "$file" | uniq -c)
+	echo "$file"
+
+	IDs=$(awk '/^>/{gsub(/>/, "",$1); print $1}' "$file" | uniq -c)
 	echo "$IDs"
 
 	Id_count=0
@@ -55,6 +58,9 @@ for file in $fa_fasta_files; do
 	else
 		echo "NO SYMLINK"
 	fi
+	echo ""
+
+	num_sequences=$(grep -c "^>" "$file")
 done
 
 echo "Total number of files: $files_count"
