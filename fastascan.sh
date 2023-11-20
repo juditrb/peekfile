@@ -36,11 +36,11 @@ total_id_count=0
 	# The "for" loop also includes if the files are symlink or not, it specifies the number of sequences and the length of nucleotide/aminoacid sequences. 
 
 for file in $fa_fasta_files; do
+	
+	echo "$file"
 
 	if [[ $(wc -l < "$file") -ge $num_lines ]]; then
     	((files_count++))
-
-	echo "$file"
 
 	IDs=$(awk '/^>/{gsub(/>/,  "",$1); print $1}' "$file" | uniq -c)
 	#echo "$IDs"
@@ -72,16 +72,16 @@ for file in $fa_fasta_files; do
 
 	echo ""
 	
-	#if [[ "$num_lines" -eq 0 ]]; then
-		#echo No content is displayed
-	#elif [[ "$(wc -l "$file")" -le $((2 * num_lines)) ]]; then
-		#cat "$file"
-	#else
-		#head -n "$num_lines" "$file"
-		#echo "..."
-		#tail -n "$num_lines" "$file"
+	if [[ "$num_lines" -eq 0 ]]; then
+		continue
+	elif [[ "$(wc -l < "$file")" -le $((2 * num_lines)) ]]; then
+		cat "$file"
+	else
+		head -n "$num_lines" "$file"
+		echo "..."
+		tail -n "$num_lines" "$file"
 
-	#fi
+	fi
 	
 	echo ""
 	
