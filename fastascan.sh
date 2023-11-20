@@ -25,8 +25,7 @@ fa_fasta_files=$(find "$folder" -type f -name "*.fa" -o -name "*.fasta")
 
 echo "Folder: $folder"
 
-echo "Fa/fasta IDs of each file: "
-
+#echo "Fa/fasta IDs of each file: "
 
 ##Initializing counter variables
 
@@ -34,6 +33,7 @@ files_count=0
 total_id_count=0
 
 ## "For" loop to count the files, to print the files IDs and to count the total IDs
+	# The "for" loop also includes if the files are symlink or not, it specifies the number of sequences and the length of nucleotide/aminoacid sequences. 
 
 for file in $fa_fasta_files; do
 
@@ -42,8 +42,8 @@ for file in $fa_fasta_files; do
 
 	echo "$file"
 
-	IDs=$(awk '/^>/{gsub(/>/, "",$1); print $1}' "$file" | uniq -c)
-	echo "$IDs"
+	IDs=$(awk '/^>/{gsub(/>/,  "",$1); print $1}' "$file" | uniq -c)
+	#echo "$IDs"
 
 	Id_count=0
 	for Id in $IDs; do
@@ -70,6 +70,19 @@ for file in $fa_fasta_files; do
 	echo Total number of nucleotides: "$Nucleotides_seqs"
 	echo Total number of aminoacids: "$Aminoacids_seqs"
 
+	echo ""
+	
+	#if [[ "$num_lines" -eq 0 ]]; then
+		#echo No content is displayed
+	#elif [[ "$(wc -l "$file")" -le $((2 * num_lines)) ]]; then
+		#cat "$file"
+	#else
+		#head -n "$num_lines" "$file"
+		#echo "..."
+		#tail -n "$num_lines" "$file"
+
+	#fi
+	
 	echo ""
 	
 	
