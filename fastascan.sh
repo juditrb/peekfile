@@ -59,10 +59,20 @@ for file in $fa_fasta_files; do
 		echo "NO SYMLINK"
 	fi
 
-	num_sequences=$(grep -c "^>" "$file")
+	num_sequences=$(grep -c '^>' "$file")
 	echo There are "$num_sequences" sequences in the file
+
 	
+	Nucleotides_seqs=$(awk '!/>/{gsub(/[^AGTCUagtcu]/, ""); print length }' "$file" | 	awk '{sum = sum + $1} END {print sum}')
+
+	Aminoacids_seqs=$(awk '!/>/{gsub(/[^ARNDCEQEGHILKMFPSTWYVarndceqeghilkfpstwyv]/, ""); print length }' 	"$file" | awk 	'{sum = sum + 	$1} END {print sum}')
+	
+	echo Total number of nucleotides: "$Nucleotides_seqs"
+	echo Total number of aminoacids: "$Aminoacids_seqs"
+
 	echo ""
+	
+	
 done
 
 echo "Total number of files: $files_count"
