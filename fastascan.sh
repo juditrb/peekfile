@@ -24,52 +24,56 @@ fi
 fa_fasta_files=$(find "$folder" -type f -name "*.fa" -o -name "*.fasta")
 
 echo "Folder: $folder"
-
-#echo "Fa/fasta IDs of each file: "
+echo ""
 
 ##Initializing counter variables
 
 files_count=0
 total_id_count=0
 
-## "For" loop is used to count fa/fasta files and the total IDs
+## The main loop of the program is a "For" loop, which is used to count fa/fasta files and the total IDs
 	# The "for" loop also includes if the files are symlink or not, it specifies the number of sequences and the length of nucleotide/aminoacid sequences. 
 
 for file in $fa_fasta_files; do
-	
-	echo "$file"
-	
+	#A file counter	
 	((files_count++))
-	#count_lines=$(cat "$file" | wc -l)
-	#if [[ $count_lines -ge $num_lines ]]; then
-    	
+
+    #Retrieving the count of unique fasta IDs for each file and aggregate them using a counter
 	IDs=$(awk '/>/{print $1}' "$file" | uniq | wc -l)
 	((total_id_count += $IDs))
 	
+	#Printing the name of each file
+	
+	echo "File name: $file"
+
 	if [[ -h "$file" ]]; then
 		echo "SYMLINK"
 	else
 		echo "NO SYMLINK"
 	fi
 
-	num_sequences=$(grep -c '^>' "$file")
+	num_sequences=$(grep -c ">" "$file")
 	echo There are "$num_sequences" sequences in the file
 
+	#Nucleotides_seqs=$(awk '!/>/{print $0}')
 	
-	Nucleotides_seqs=$(awk '!/>/{gsub(/[^AGTCUagtcu]/, ""); print length }' "$file" | 	awk '{sum = sum + $1} END {print sum}')
+	#Nucleotide_seqs=$(awk '!/>/{gsub(/[^ATGCUatgcuARNDCQEGHILKMFSTWYVarndcqeghilkmfstwyv]/, ""); print length }' "$file" | awk 	'{sum = sum + $1} END {print sum}')
+	#Aminoacids_seqs=$(awk '!/>/{gsub(/[^ARNDCEQEGHILKMFPSTWYVarndceqeghilkfpstwyv]/, ""); print length }' 	"$file" | awk 	'{sum = sum + 	$1} END {print sum}')
+	#echo "Total number of nucleotides:$Nucleotide_seqs"
+	Nucleotide_seqs=$(grep -v ">" $file | grep -v [RNDQEHILKMFSWYVrndqehilkmfswyv] | sed 's/-//g' | tr -d "\n" | awk '{print length($0)}')
+	Echo "Total number of nucleotides: $Nucleotide_seqs"
 
-	Aminoacids_seqs=$(awk '!/>/{gsub(/[^ARNDCEQEGHILKMFPSTWYVarndceqeghilkfpstwyv]/, ""); print length }' 	"$file" | awk 	'{sum = sum + 	$1} END {print sum}')
-	
-	echo Total number of nucleotides: "$Nucleotides_seqs"
-	echo Total number of aminoacids: "$Aminoacids_seqs"
+	Aminoacid_seqs=$(grep -v ">" $file | grep [RNDQEHILKMFSWYVrndqehilkmfswyv] | sed 's/-//g' | tr -d "\n" | awk '{print length($0)}')
+	Echo "Total number of amino acids: $Aminoacid_seqs"
 
 	echo ""
 	
 	if [[ "$num_lines" -eq 0 ]]; then
 		continue
-	elif [[ "$(wc -l < "$file")" -le $((2 * num_lines)) ]]; then
+	elif [[ "$(cat $file | wc -l)" -le $((2 * num_lines)) ]]; then
 		cat "$file"
 	else
+		echo "File content summary:"
 		head -n "$num_lines" "$file"
 		echo "..."
 		tail -n "$num_lines" "$file"
@@ -81,5 +85,7 @@ for file in $fa_fasta_files; do
 	
 done
 
+echo ""
+Echo "Total count:"
 echo "Total number of files: $files_count"
 echo "Total number of IDs: $total_id_count"
