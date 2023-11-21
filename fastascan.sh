@@ -32,26 +32,19 @@ echo "Folder: $folder"
 files_count=0
 total_id_count=0
 
-## "For" loop to count the files, to print the files IDs and to count the total IDs
+## "For" loop is used to count fa/fasta files and the total IDs
 	# The "for" loop also includes if the files are symlink or not, it specifies the number of sequences and the length of nucleotide/aminoacid sequences. 
 
 for file in $fa_fasta_files; do
 	
 	echo "$file"
-
-	if [[ $(wc -l < "$file") -ge $num_lines ]]; then
-    	((files_count++))
-
-	IDs=$(awk '/^>/{gsub(/>/,  "",$1); print $1}' "$file" | uniq -c)
-	#echo "$IDs"
-
-	Id_count=0
-	for Id in $IDs; do
-		((Id_count++))		
-	done
-	((total_id_count += Id_count))
-
-	fi
+	
+	((files_count++))
+	#count_lines=$(cat "$file" | wc -l)
+	#if [[ $count_lines -ge $num_lines ]]; then
+    	
+	IDs=$(awk '/>/{print $1}' "$file" | uniq | wc -l)
+	((total_id_count += $IDs))
 	
 	if [[ -h "$file" ]]; then
 		echo "SYMLINK"
