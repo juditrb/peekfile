@@ -43,11 +43,11 @@ for file in $fa_fasta_files; do
 	((total_id_count += $IDs))
 
 	#To make sure the file is not binary, grep is used to know if the file has ">" symbol
-	if [[ grep -q ">" "$file" ]]; then
+	if grep -q ">" "$file" ; then
 
 		#Printing the name of each file
 	
-		echo "File name: $file"
+		echo "<<<< $file >>>>"
 
 		#An "if" is used to know if the file is a symlink or not, printing this information in the output
 		if [[ -h "$file" ]]; then
@@ -69,13 +69,13 @@ for file in $fa_fasta_files; do
 			#Aminoacid_seqs=$(grep -v ">" $file | grep [RNDQEHILKMFSWYVrndqehilkmfswyv] | sed 's/-//g' | tr -d "\n" | awk '{print length($0)}')
 			#Echo "Total number of amino acids: $Aminoacid_seqs"
 
-		if grep -v ">" "$file" | grep -q '[RNDQEHILKMFSWYVrndqehilkmfswyv]'; then
+		if grep -v ">" "$file" | grep -q '[RDQEHILKMFSWYVrdqehilkmfswyv]'; then
 			Aminoacid_seqs=$(grep -v ">" "$file" | sed 's/-//g' | tr -d "\n" | awk '{print length($0)}')
-			echo "No nucleotide sequences found"
+			echo "The file contains amino acid sequences"
 			echo "Total number of amino acids: $Aminoacid_seqs"
 		else
 			Nucleotide_seqs=$(grep -v ">" "$file" | sed 's/-//g' | tr -d "\n" | awk '{print length($0)}')
-			Aminoacid_seqs="No amino acid sequences found"
+			echo "The file contains nucleotide sequences"
 			echo "Total number of nucleotides: $Nucleotide_seqs"
 		fi
 	
@@ -94,13 +94,18 @@ for file in $fa_fasta_files; do
 		fi
 	
 		echo ""
+	elif ! [[ -s "$file" ]]; then
+		echo The file is empty.
 	else 
-		echo ###WARNING MESSAGE: The file is binary###
+		echo ###WARNING MESSAGE: It is a binary file###
+
 	fi
 	
 done
 
 echo ""
-Echo "Total count:"
+
 echo "Total number of files: $files_count"
 echo "Total number of IDs: $total_id_count"
+
+echo ""
