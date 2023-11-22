@@ -63,12 +63,6 @@ for file in $fa_fasta_files; do
 		#Counting nucleotides and amino acids depending on whether the sequence contains or does not contain the letters of the amino acids, which are RNDQEHILKMFSWYVrndqehilkmfswyv. 
 			#Amino acid letters matching the nucleotides letters (AGCTUagctu) are extracted from the pattern.  
 
-			#Nucleotide_seqs=$(grep -v ">" $file | grep -v [RNDQEHILKMFSWYVrndqehilkmfswyv] | sed 's/-//g' | tr -d "\n" | awk '{print length($0)}')
-			#Echo "Total number of nucleotides: $Nucleotide_seqs"
-
-			#Aminoacid_seqs=$(grep -v ">" $file | grep [RNDQEHILKMFSWYVrndqehilkmfswyv] | sed 's/-//g' | tr -d "\n" | awk '{print length($0)}')
-			#Echo "Total number of amino acids: $Aminoacid_seqs"
-
 		if grep -v ">" "$file" | grep -q '[RDQEHILKMFSWYVrdqehilkmfswyv]'; then
 			Aminoacid_seqs=$(grep -v ">" "$file" | sed 's/-//g' | tr -d "\n" | awk '{print length($0)}')
 			echo "The file contains amino acid sequences"
@@ -95,10 +89,13 @@ for file in $fa_fasta_files; do
 	
 		echo ""
 	elif ! [[ -s "$file" ]]; then
-		echo The file is empty.
+		echo "<<<< $file >>>>"
+		echo "The file is empty"
+		echo ""
 	else 
+		echo "<<<< $file >>>>"
 		echo ###WARNING MESSAGE: It is a binary file###
-
+		echo ""
 	fi
 	
 done
