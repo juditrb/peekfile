@@ -41,47 +41,62 @@ for file in $fa_fasta_files; do
     #Retrieving the count of unique fasta IDs for each file and aggregate them using a counter
 	IDs=$(awk '/>/{print $1}' "$file" | uniq | wc -l)
 	((total_id_count += $IDs))
-	
-	#Printing the name of each file
-	
-	echo "File name: $file"
 
-	if [[ -h "$file" ]]; then
-		echo "SYMLINK"
-	else
-		echo "NO SYMLINK"
+	#To make sure the file is not binary, grep is used to know if the file has ">" symbol
+	if [[ grep -q ">" "$file" ]]; then
+
+		#Printing the name of each file
+	
+		echo "File name: $file"
+
+		#An "if" is used to know if the file is a symlink or not, printing this information in the output
+		if [[ -h "$file" ]]; then
+			echo "SYMLINK"
+		else
+			echo "NO SYMLINK"
+		fi
+
+		#As each sequence is preceded by its ">ID", grep is used to search for the ">" symbol into the file, counting the total sequences that are there. 
+		num_sequences=$(grep -c ">" "$file")
+		echo There are "$num_sequences" sequences in the file
+
+		#Counting nucleotides and amino acids depending on whether the sequence contains or does not contain the letters of the amino acids, which are RNDQEHILKMFSWYVrndqehilkmfswyv. 
+			#Amino acid letters matching the nucleotides letters (AGCTUagctu) are extracted from the pattern.  
+
+			#Nucleotide_seqs=$(grep -v ">" $file | grep -v [RNDQEHILKMFSWYVrndqehilkmfswyv] | sed 's/-//g' | tr -d "\n" | awk '{print length($0)}')
+			#Echo "Total number of nucleotides: $Nucleotide_seqs"
+
+			#Aminoacid_seqs=$(grep -v ">" $file | grep [RNDQEHILKMFSWYVrndqehilkmfswyv] | sed 's/-//g' | tr -d "\n" | awk '{print length($0)}')
+			#Echo "Total number of amino acids: $Aminoacid_seqs"
+
+		if grep -v ">" "$file" | grep -q '[RNDQEHILKMFSWYVrndqehilkmfswyv]'; then
+			Aminoacid_seqs=$(grep -v ">" "$file" | sed 's/-//g' | tr -d "\n" | awk '{print length($0)}')
+			echo "No nucleotide sequences found"
+			echo "Total number of amino acids: $Aminoacid_seqs"
+		else
+			Nucleotide_seqs=$(grep -v ">" "$file" | sed 's/-//g' | tr -d "\n" | awk '{print length($0)}')
+			Aminoacid_seqs="No amino acid sequences found"
+			echo "Total number of nucleotides: $Nucleotide_seqs"
+		fi
+	
+		echo ""
+	
+		if [[ "$num_lines" -eq 0 ]]; then
+			continue
+		elif [[ "$(cat $file | wc -l)" -le $((2 * num_lines)) ]]; then
+			cat "$file"
+		else
+			echo "File content summary:"
+			head -n "$num_lines" "$file"
+			echo "..."
+			tail -n "$num_lines" "$file"
+
+		fi
+	
+		echo ""
+	else 
+		echo ###WARNING MESSAGE: The file is binary###
 	fi
-
-	num_sequences=$(grep -c ">" "$file")
-	echo There are "$num_sequences" sequences in the file
-
-	#Nucleotides_seqs=$(awk '!/>/{print $0}')
-	
-	#Nucleotide_seqs=$(awk '!/>/{gsub(/[^ATGCUatgcuARNDCQEGHILKMFSTWYVarndcqeghilkmfstwyv]/, ""); print length }' "$file" | awk 	'{sum = sum + $1} END {print sum}')
-	#Aminoacids_seqs=$(awk '!/>/{gsub(/[^ARNDCEQEGHILKMFPSTWYVarndceqeghilkfpstwyv]/, ""); print length }' 	"$file" | awk 	'{sum = sum + 	$1} END {print sum}')
-	#echo "Total number of nucleotides:$Nucleotide_seqs"
-	Nucleotide_seqs=$(grep -v ">" $file | grep -v [RNDQEHILKMFSWYVrndqehilkmfswyv] | sed 's/-//g' | tr -d "\n" | awk '{print length($0)}')
-	Echo "Total number of nucleotides: $Nucleotide_seqs"
-
-	Aminoacid_seqs=$(grep -v ">" $file | grep [RNDQEHILKMFSWYVrndqehilkmfswyv] | sed 's/-//g' | tr -d "\n" | awk '{print length($0)}')
-	Echo "Total number of amino acids: $Aminoacid_seqs"
-
-	echo ""
-	
-	if [[ "$num_lines" -eq 0 ]]; then
-		continue
-	elif [[ "$(cat $file | wc -l)" -le $((2 * num_lines)) ]]; then
-		cat "$file"
-	else
-		echo "File content summary:"
-		head -n "$num_lines" "$file"
-		echo "..."
-		tail -n "$num_lines" "$file"
-
-	fi
-	
-	echo ""
-	
 	
 done
 
