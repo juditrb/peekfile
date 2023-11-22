@@ -60,8 +60,8 @@ for file in $fa_fasta_files; do
 		num_sequences=$(grep -c ">" "$file")
 		echo There are "$num_sequences" sequences in the file
 
-		#Counting nucleotides and amino acids depending on whether the sequence contains or does not contain the letters of the amino acids, which are RNDQEHILKMFSWYVrndqehilkmfswyv. 
-			#Amino acid letters matching the nucleotides letters (AGCTUagctu) are extracted from the pattern.  
+		#Counting nucleotides and amino acids depending on whether the sequence contains or does not contain the letters of the amino acids, which are RDQEHILKMFSWYVrdqehilkmfswyv. 
+			#Amino acid letters matching the nucleotides letters (AGCTUNagctun) are extracted from the pattern.  
 
 		if grep -v ">" "$file" | grep -q '[RDQEHILKMFSWYVrdqehilkmfswyv]'; then
 			Aminoacid_seqs=$(grep -v ">" "$file" | sed 's/-//g' | tr -d "\n" | awk '{print length($0)}')
@@ -74,7 +74,8 @@ for file in $fa_fasta_files; do
 		fi
 	
 		echo ""
-	
+
+		#Printing full content of file or some lines depending on the number of lines. 
 		if [[ "$num_lines" -eq 0 ]]; then
 			continue
 		elif [[ "$(cat $file | wc -l)" -le $((2 * num_lines)) ]]; then
@@ -88,6 +89,10 @@ for file in $fa_fasta_files; do
 		fi
 	
 		echo ""
+	
+	#If the file is empty to print that it has no content.
+	#If the file doesn't contain ">" symbol and it is not empty, to print a warning message saying that is a binary file.
+
 	elif ! [[ -s "$file" ]]; then
 		echo "<<<< $file >>>>"
 		echo "The file is empty"
@@ -102,6 +107,7 @@ done
 
 echo ""
 
+#Printing the total number of files and IDs using the counter variables files_count and total_id_count. 
 echo "Total number of files: $files_count"
 echo "Total number of IDs: $total_id_count"
 
